@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -21,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.unscramble.ui.theme.UnscrambleTheme
-import androidx.compose.foundation.layout.padding
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +41,12 @@ class MainActivity : ComponentActivity() {
 fun GameScreen(modifier: Modifier = Modifier) {
     var userAnswer by remember {
         mutableStateOf("")
+    }
+
+    val correctAnswer = "CAT"
+
+    var score by remember {
+        mutableStateOf(0)
     }
 
     Column(
@@ -69,12 +75,16 @@ fun GameScreen(modifier: Modifier = Modifier) {
             }
         )
         Button(
-            onClick = { }
+            onClick = {
+                if (userAnswer == correctAnswer) {
+                    score++
+                }
+            }
         ) {
             Text("SUBMIT")
         }
         Text(
-            text = "Score: 0"
+            text = "Score: $score"
         )
     }
 }
