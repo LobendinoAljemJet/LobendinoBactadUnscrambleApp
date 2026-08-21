@@ -55,6 +55,12 @@ fun GameScreen(modifier: Modifier = Modifier) {
 
     val correctAnswer = words[currentWordIndex]
 
+    var scrambledWord by remember {
+        mutableStateOf(
+            words[0].shuffled().joinToString("")
+        )
+    }
+
     var score by remember {
         mutableStateOf(0)
     }
@@ -69,7 +75,7 @@ fun GameScreen(modifier: Modifier = Modifier) {
             fontSize = 30.sp
         )
         Text(
-            text = correctAnswer,
+            text = scrambledWord,
             fontSize = 40.sp
         )
         Text(
@@ -91,6 +97,9 @@ fun GameScreen(modifier: Modifier = Modifier) {
                     if (currentWordIndex < words.size - 1) {
                         currentWordIndex++
                         userAnswer = ""
+                        scrambledWord = words[currentWordIndex]
+                            .shuffled()
+                            .joinToString("")
                     }
                 }
             }
