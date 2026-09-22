@@ -55,6 +55,15 @@ fun GameScreen(modifier: Modifier = Modifier) {
 
     val correctAnswer = words[currentWordIndex]
 
+    val scrambledWord = remember(correctAnswer) {
+        val chars = correctAnswer.toCharArray()
+        chars.shuffle()
+        while (String(chars) == correctAnswer && correctAnswer.length > 1) {
+            chars.shuffle()
+        }
+        String(chars)
+    }
+
     var score by remember {
         mutableStateOf(0)
     }
@@ -69,7 +78,7 @@ fun GameScreen(modifier: Modifier = Modifier) {
             fontSize = 30.sp
         )
         Text(
-            text = correctAnswer,
+            text = scrambledWord,
             fontSize = 40.sp
         )
         Text(
