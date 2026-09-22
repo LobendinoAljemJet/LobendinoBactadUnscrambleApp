@@ -13,14 +13,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,35 +37,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GameScreen(modifier: Modifier = Modifier) {
-    var userAnswer by remember {
-        mutableStateOf("")
-    }
-
-    val words = listOf(
-        "CAT",
-        "DOG",
-        "BOOK"
-    )
-
-    var currentWordIndex by remember {
-        mutableStateOf(0)
-    }
-
-    val correctAnswer = words[currentWordIndex]
-
-    val scrambledWord = remember(correctAnswer) {
-        val chars = correctAnswer.toCharArray()
-        chars.shuffle()
-        while (String(chars) == correctAnswer && correctAnswer.length > 1) {
-            chars.shuffle()
-        }
-        String(chars)
-    }
-
-    var score by remember {
-        mutableStateOf(0)
-    }
+fun GameScreen(
+    modifier: Modifier = Modifier,
+    gameViewModel: GameViewModel = viewModel()
+) {
+    val gameUiState by gameViewModel.uiState.collectAsState()
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -78,36 +53,40 @@ fun GameScreen(modifier: Modifier = Modifier) {
             fontSize = 30.sp
         )
         Text(
-            text = scrambledWord,
+            text = if (gameUiState.isGameOver) "DONE!" else gameUiState.currentScrambledWord,
             fontSize = 40.sp
         )
         Text(
-            text = "Unscramble the word!"
+            text = if (gameUiState.isGameOver) "You finished the game!" else "Unscramble the word!"
         )
-        OutlinedTextField(
-            value = userAnswer,
-            onValueChange = {
-                userAnswer = it
-            },
-            label = {
-                Text("Enter your answer")
-            }
-        )
-        Button(
-            onClick = {
-                if (userAnswer == correctAnswer) {
-                    score++
-                    if (currentWordIndex < words.size - 1) {
-                        currentWordIndex++
-                        userAnswer = ""
-                    }
+        if (!gameUiState.isGameOver) {
+            OutlinedTextField(
+                value = gameViewModel.userAnswer,
+                onValueChange = {
+                    gameViewModel.updateUserAnswer(it)
+                },
+                label = {
+                    Text("Enter your answer")
                 }
+            )
+            Button(
+                onClick = {
+                    gameViewModel.checkUserGuess()
+                }
+            ) {
+                Text("SUBMIT")
             }
-        ) {
-            Text("SUBMIT")
+        } else {
+            Button(
+                onClick = {
+                    gameViewModel.resetGame()
+                }
+            ) {
+                Text("PLAY AGAIN")
+            }
         }
         Text(
-            text = "Score: $score"
+            text = "Score: ${gameUiState.score}"
         )
     }
 }
