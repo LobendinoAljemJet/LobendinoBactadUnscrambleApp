@@ -61,7 +61,7 @@ fun GameScreen(
         )
         if (!gameUiState.isGameOver) {
             OutlinedTextField(
-                value = gameViewModel.userAnswer,
+                value = gameUiState.userAnswer,
                 onValueChange = {
                     gameViewModel.updateUserAnswer(it)
                 },
